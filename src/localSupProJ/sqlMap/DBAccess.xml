@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="DBAccess">
+	<update id="mergeData" parameterType="java.util.HashMap">
+		/* mergeData : 지자체 지원사업 정보 머지 */
+		MERGE T_LOCAL_SUPPROJ_INFO AS A 
+		USING (SELECT #{readKey } AS READ_KEY, #{SIDO} AS SIDO)  AS B
+		   ON A.READ_KEY = B.READ_KEY
+		  AND A.SIDO = B.SIDO
+		 WHEN MATCHED THEN
+	   UPDATE SET
+			  SIDO = #{SIDO }
+			, SIGUGUN = #{SIGUGUN }
+			, PROJ_GUBUN = #{PROJ_GUBUN }
+			, PROJ_NAME = #{PROJ_NAME }
+			, PROJ_STEP = #{PROJ_STEP }
+			, PROJ_PERIOD = #{PROJ_PERIOD }
+			, PROJ_TARGET = #{PROJ_TARGET }
+			, PROJ_SUMMARY = #{PROJ_SUMMARY }
+			, SUPPORT_MONEY = #{SUPPORT_MONEY }
+			, PART_NUM = #{PART_NUM }
+			, REG_POST_NAME = #{REG_POST_NAME }
+			, REG_POST_DATE = #{REG_POST_DATE }
+			, GUBUN = #{GUBUN }
+			, RECEIPT_PERIOD = #{RECEIPT_PERIOD }
+			, RECEIPT_METHOD = #{RECEIPT_METHOD }
+			, RESULT_DATE = #{RESULT_DATE }
+			, ORGANIZATION = #{ORGANIZATION }
+			, PROJ_DEPT = #{PROJ_DEPT }
+			, PROJ_CHARGE = #{PROJ_CHARGE }
+			, PROJ_CONTACT = #{PROJ_CONTACT }
+			, INFO_ATTACH_FILE = #{INFO_ATTACH_FILE }
+			, INFO_ATTACH_FILE_URL = #{INFO_ATTACH_FILE_URL }
+			, UPDDT = GETDATE()
+			, UPDMEMID = 'SYSTEM'
+		 WHEN NOT MATCHED THEN
+	   INSERT (
+			  READ_KEY, READ_URL, SIDO, SIGUGUN, SUBJECT
+			, CONTENT, PROJ_GUBUN, PROJ_NAME, PROJ_STEP, PROJ_PERIOD
+			, PROJ_TARGET, PROJ_SUMMARY, SUPPORT_MONEY, PART_NUM, REG_POST_NAME
+			, REG_POST_DATE, GUBUN, RECEIPT_PERIOD, RECEIPT_METHOD
+			, RESULT_DATE, ORGANIZATION, PROJ_DEPT, PROJ_CHARGE, PROJ_CONTACT
+			, INFO_ATTACH_FILE, INFO_ATTACH_FILE_URL, DELYN, REGDT, REGMEMID
+			  )
+	   VALUES (
+			  #{readKey }, #{detailUrl }, #{SIDO }, #{SIGUGUN }, #{SUBJECT }
+			, #{CONTENT }, #{PROJ_GUBUN }, #{PROJ_NAME }, #{PROJ_STEP }, #{PROJ_PERIOD }
+			, #{PROJ_TARGET }, #{PROJ_SUMMARY }, #{SUPPORT_MONEY }, #{PART_NUM }, #{REG_POST_NAME }
+			, #{REG_POST_DATE }, #{GUBUN }, #{RECEIPT_PERIOD }, #{RECEIPT_METHOD }
+			, #{RESULT_DATE }, #{ORGANIZATION }, #{PROJ_DEPT }, #{PROJ_CHARGE }, #{PROJ_CONTACT }
+			, #{INFO_ATTACH_FILE }, #{INFO_ATTACH_FILE_URL }, 'N', getdate(), 'SYSTEM'
+			  );
+	</update>
+	
+	<insert id="mergeBoard" parameterType="java.util.HashMap">
+		/* mergeBoard : 지자체 지원사업 게시판 머지 */
+		MERGE T_BOARD AS A 
+		USING (SELECT LS_IDX FROM T_LOCAL_SUPPROJ_INFO WHERE READ_KEY = #{readKey } AND SIDO = #{SIDO} )  AS B
+		   ON (A.LS_IDX = B.LS_IDX AND BC_ID = '503')
+		 WHEN MATCHED THEN
+	   UPDATE SET
+			  B_PIDX = B_IDX
+			, UPDDT = GETDATE()
+			, UPDMEMID = 'SYSTEM'
+		 WHEN NOT MATCHED THEN
+	   INSERT (
+			  BC_ID, B_LEVEL, B_ORDER, B_NAME
+			, B_TITLE, B_CONTENTS, B_SECRETYN, B_NOTICEYN, B_DISPLAYYN
+			, REGDT, REGMEMID, DELYN, LS_IDX, B_ACCEPTYN
+		)VALUES (
+			  '503', '0', '0', #{REG_POST_NAME}
+			, #{SUBJECT}, #{CONTENT}, 'N', 'N', 'Y'
+			, GETDATE(), 'SYSTEM', 'N', (SELECT LS_IDX FROM T_LOCAL_SUPPROJ_INFO WHERE READ_KEY = #{readKey } AND SIDO = #{SIDO} ), 'N'
+		);
+	</insert>
+	
+	<update id="pidBoard" parameterType="java.util.HashMap">
+		/* pidBoard : 지자체 지원사업 게시판 pid 업데이트 */
+		UPDATE T_BOARD
+		   SET B_PIDX = B_IDX
+		 WHERE BC_ID = '503'
+	</update>
+	
+	<update id="mergeWeatherData" parameterType="java.util.HashMap">
+		/* mergeWeatherData : 기상정보 머지 */
+		MERGE T_WEATHER_LOCAL AS A 
+		USING (SELECT CONVERT(VARCHAR(8), GETDATE(), 112) + CONVERT(VARCHAR(2), GETDATE(), 114) AS LOCAL_GROUP
+					, #{regRegion} AS REG_REGION, #{regNm} AS REG_NM, #{regId} AS REG_ID)  AS B
+		   ON A.LOCAL_GROUP = B.LOCAL_GROUP
+		  AND A.REG_REGION = B.REG_REGION
+		  AND A.REG_NM = B.REG_NM
+		  AND A.REG_ID = B.REG_ID
+		 WHEN MATCHED THEN
+	   UPDATE SET
+			  ANNOUNCE_TIME = #{announceTime }
+			, NUM_EF = #{numEf }
+			, WD1 = #{wd1 }
+			, WD_TND = #{wdTnd }
+			, WD2 = #{wd2 }
+			, WS_IT = #{wsIt }
+			, RN_ST = #{rnSt }
+			, TA = #{ta }
+			, WF = #{wf }
+			, WF_CD = #{wfCd }
+			, RN_YN = #{rnYn }
+			, REGDT = GETDATE()
+		 WHEN NOT MATCHED THEN
+	   INSERT (
+			  LOCAL_GROUP, REG_REGION, REG_NM, REG_ID, ANNOUNCE_TIME
+			, NUM_EF, WD1, WD_TND, WD2, WS_IT
+			, RN_ST, TA, WF, WF_CD, RN_YN
+			, REGDT
+			  )
+	   VALUES (
+			  CONVERT(VARCHAR(8), GETDATE(), 112) + CONVERT(VARCHAR(2), GETDATE(), 114)
+			, #{regRegion }, #{regNm }, #{regId }, #{announceTime }
+			, #{numEf }, #{wd1 }, #{wdTnd }, #{wd2 }, #{wsIt }
+			, #{rnSt }, #{ta }, #{wf }, #{wfCd }, #{rnYn }
+			, GETDATE()
+			  );
+	</update>
+	
+	<update id="mergeDustAirData" parameterType="java.util.HashMap">
+		/* mergeDustAirData : 대기정보 머지 */
+		MERGE T_DUST_AIR_LOCAL AS A 
+		USING (SELECT CONVERT(VARCHAR(8), GETDATE(), 112) + CONVERT(VARCHAR(2), GETDATE(), 114) AS LOCAL_GROUP
+					, #{stationName } AS STATION_NAME, #{stationNm } AS STATION_NM, #{stationRegion } AS STATION_REGION)  AS B
+		   ON A.LOCAL_GROUP = B.LOCAL_GROUP
+		  AND A.STATION_NAME = B.STATION_NAME
+		  AND A.STATION_NM = B.STATION_NM
+		  AND A.STATION_REGION = B.STATION_REGION
+		 WHEN MATCHED THEN
+	   UPDATE SET
+			  DATA_TIME = #{dataTime }
+			, PM10_VALUE = #{pm10Value }
+			, PM10_GRADE = #{pm10Grade }
+			, PM10_GRADE1H = #{pm10Grade1h }
+			, PM25_VALUE = #{pm25Value }
+			, PM25_GRADE = #{pm25Grade }
+			, PM25_GRADE1H = #{pm25Grade1h }
+			, REGDT = GETDATE()
+		 WHEN NOT MATCHED THEN
+	   INSERT (
+			  LOCAL_GROUP, STATION_NAME, STATION_NM, STATION_REGION, DATA_TIME
+			, PM10_VALUE, PM10_GRADE, PM10_GRADE1H, PM25_VALUE, PM25_GRADE
+			, PM25_GRADE1H, REGDT
+			  )
+	   VALUES (
+			  CONVERT(VARCHAR(8), GETDATE(), 112) + CONVERT(VARCHAR(2), GETDATE(), 114)
+			, #{stationName }, #{stationNm }, #{stationRegion }, #{dataTime }
+			, #{pm10Value }, #{pm10Grade }, #{pm10Grade1h }, #{pm25Value }, #{pm25Grade }
+			, #{pm25Grade1h }, GETDATE()
+			  );
+	</update>
+	
+</mapper>
