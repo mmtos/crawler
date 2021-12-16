@@ -1,4 +1,4 @@
-package localSupProJ.config;
+package localSupProJ.persistence.config;
 
 import java.io.InputStream;
 import org.apache.ibatis.io.Resources;
@@ -11,14 +11,10 @@ public class DataBaseConfig {
 	private SqlSession mFactorySession = null;
 	
 	public DataBaseConfig() {
-		try {
-			mybatis_config_path = "localSupProJ/config/mybatis-config.xml";
-		}catch(Exception e) {
-			e.printStackTrace();
-		}
+		this.mybatis_config_path = "localSupProJ/persistence/config/mybatis-config.xml";
 	}
 	
-	public static DataBaseConfig getInstnace() {
+	public static DataBaseConfig getInstance() {
 		return LazyHolder.INSTANCE;
 	}
 	

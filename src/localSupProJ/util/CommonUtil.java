@@ -1,6 +1,6 @@
 package localSupProJ.util;
 
-public class util {
+public class CommonUtil {
 	public static String chkNull(Object object){
 		String reStr = "";
 		if(object == null){

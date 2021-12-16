@@ -4,26 +4,24 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Set;
-import localSupProJ.config.DataBaseConfig;
-import localSupProJ.service.DBAccessService;
-import localSupProJ.service.DBAccessServiceImpl;
-import org.apache.ibatis.session.SqlSession;
+import localSupProJ.persistence.config.DataBaseConfig;
+import localSupProJ.persistence.service.DBAccessFactory;
+import localSupProJ.persistence.service.DBAccessService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class dataJsoup {
-	static Logger log = LoggerFactory.getLogger(dataJsoup.class);
-	public static void procDataJsoup(ArrayList<HashMap<String, String>> siteDetailList) throws Exception{
-		SqlSession session = null;
-		DBAccessServiceImpl dbAccessService = null;
+public class DataCollectDAO {
+	static Logger log = LoggerFactory.getLogger(DataCollectDAO.class);
+
+	public static void mergeSiteDetailData(ArrayList<HashMap<String, String>> siteDetailList) throws Exception{
+		DBAccessService dbAccessService = null;
 		HashMap<String, String> paramMap = new HashMap<String, String>();
 		String sqlId = "mergeData";
 		String sqlId2 = "mergeBoard";
 		String sqlId3 = "pidBoard";
 		
 		try{
-			session = DataBaseConfig.getInstnace().openSqlSession();
-			dbAccessService = new DBAccessServiceImpl(session);
+			dbAccessService = DBAccessFactory.getDBAccessService();
 			
 			for(HashMap<String, String> siteMap : siteDetailList){
 				paramMap = new HashMap<String, String>();
@@ -36,7 +34,7 @@ public class dataJsoup {
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			DataBaseConfig.getInstnace().closeSqlSession();
+			DataBaseConfig.getInstance().closeSqlSession();
 		}
 	}
 	
@@ -144,37 +142,32 @@ public class dataJsoup {
 		return returnMap;
 	}
 	
-	public static void procDataWeather(ArrayList<HashMap<String, String>> weatherList) throws Exception{
-		SqlSession session = null;
-		DBAccessServiceImpl dbAccessService = null;
+	public static void mergeWeatherData(ArrayList<HashMap<String, String>> weatherList) throws Exception{
+		DBAccessService dbAccessService = null;
 		HashMap<String, String> paramMap = new HashMap<String, String>();
 		String sqlId = "mergeWeatherData";
 		
 		try{
-			session = DataBaseConfig.getInstnace().openSqlSession();
-			dbAccessService = new DBAccessServiceImpl(session);
+			dbAccessService = DBAccessFactory.getDBAccessService();
 			
 			for(HashMap<String, String> weatherMap : weatherList){
 				paramMap = new HashMap<String, String>();
 				mergeData(dbAccessService,weatherMap,sqlId);
 			}
-			
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			DataBaseConfig.getInstnace().closeSqlSession();
+			DataBaseConfig.getInstance().closeSqlSession();
 		}
 	}
 	
-	public static void procDataDustAir(ArrayList<HashMap<String, String>> dustAirList) throws Exception{
-		SqlSession session = null;
-		DBAccessServiceImpl dbAccessService = null;
+	public static void mergeDustAirData(ArrayList<HashMap<String, String>> dustAirList) throws Exception{
+		DBAccessService dbAccessService = null;
 		HashMap<String, String> paramMap = new HashMap<String, String>();
 		String sqlId = "mergeDustAirData";
 		
 		try{
-			session = DataBaseConfig.getInstnace().openSqlSession();
-			dbAccessService = new DBAccessServiceImpl(session);
+			dbAccessService = DBAccessFactory.getDBAccessService();
 			
 			for(HashMap<String, String> dustAirMap : dustAirList){
 				paramMap = new HashMap<String, String>();
@@ -184,7 +177,7 @@ public class dataJsoup {
 		}catch(Exception e){
 			e.printStackTrace();
 		}finally{
-			DataBaseConfig.getInstnace().closeSqlSession();
+			DataBaseConfig.getInstance().closeSqlSession();
 		}
 	}
 	

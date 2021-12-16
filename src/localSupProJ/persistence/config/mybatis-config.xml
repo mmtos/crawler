@@ -23,6 +23,6 @@
 	</environments>
 	
 	<mappers>
-		<mapper resource="localSupProJ/sqlMap/DBAccess.xml"/>
+		<mapper resource="localSupProJ/persistence/sqlMap/DBAccess.xml"/>
 	</mappers>
 </configuration>

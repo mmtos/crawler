@@ -1,4 +1,4 @@
-package localSupProJ.service;
+package localSupProJ.persistence.service;
 
 import java.util.HashMap;
 import org.apache.ibatis.session.SqlSession;
